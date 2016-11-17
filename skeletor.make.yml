@@ -11,4 +11,4 @@ defaults:
 
 # Contrib Modules and Themes
 projects:
-  admin_toolbar: "1.10"
+  bootstrap: "3.0"

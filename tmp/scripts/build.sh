@@ -12,9 +12,26 @@
 set -e
 
 # Set from args
-PROJECT="$1"
-BUILD_DEST="$2"
-REVISION="$3"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --project=*)
+      PROJECT="${1#*=}"
+      ;;
+    --destination=*)
+      BUILD_DEST="${1#*=}"
+      ;;
+    --revision=*)
+      REVISION="${1#*=}"
+      ;;
+    *)
+      printf "***************************\n"
+      printf "* Error: Invalid argument.*\n"
+      printf "***************************\n"
+      exit 1
+  esac
+  shift
+done
+
 MAKE_OPTS=" --prepare-install --y"
 REVISION_PATTERN="([a-f0-9]{40}|[a-f0-9]{6,8})$"
 
@@ -41,6 +58,9 @@ fi
 # Drush make the site structure
 echo "::Running drush make"
 drush make build.make.yml ${BUILD_DEST} ${MAKE_OPTS}
+
+echo "::Renaming the profile folder"
+mv ${BUILD_DEST}/profiles/skeletor ${BUILD_DEST}/profiles/${PROJECT}
 
 # Copy the settings.yml.
 cp ${BUILD_DEST}/sites/default/default.services.yml ${BUILD_DEST}/sites/default/services.yml
@@ -102,6 +122,14 @@ do
       compass compile
     fi
   fi
+done
+
+echo "::Renaming skeletor files to the new profile name"
+cd $BUILD_DEST/profiles/${PROJECT}
+for i in skeletor.*;
+do
+  mv "$i" $(echo "$i" | sed -E "s/skeletor.([a-z.])/$PROJECT.\1/g");
+  echo "Renaming $i"
 done
 
 if [[ -z "$REVISION" ]] || [[ "$REVISION" == 'false' ]]; then
