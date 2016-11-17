@@ -132,6 +132,10 @@ do
   echo "Renaming $i"
 done
 
+echo "::Find and replace skeletor vars for Project"
+cd $BUILD_DEST/profiles/${PROJECT}
+rpl -R "skeletor" "${PROJECT}" ./
+
 if [[ -z "$REVISION" ]] || [[ "$REVISION" == 'false' ]]; then
   echo "::Removing non-production files"
   cd $BUILD_DEST
