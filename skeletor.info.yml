@@ -39,6 +39,7 @@ dependencies:
   - system
   - taxonomy
   - text
+  - toolbar
   - user
   - views
   - views_ui
